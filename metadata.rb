@@ -1,0 +1,11 @@
+name             'chef_metric_tank'
+maintainer       'Raintank, Inc.'
+maintainer_email 'cookbooks@raintank.io'
+license          'Apache 2.0'
+description      'Installs/Configures chef_metric_tank'
+long_description 'Installs/Configures chef_metric_tank'
+version          '0.1.0'
+
+depends 'chef_base', '~> 0.1.0'
+depends 'logrotate', '~> 1.9.1'
+depends 'packagecloud', '~> 0.2.0'
