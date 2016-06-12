@@ -21,12 +21,12 @@ node.set['chef_metric_tank']['instance'] = node['hostname']
 
 # zone format:  projects/417965514133/zones/us-central1-a.
 # we split to us-central1-a, then split that to get just "a"
+node.name =~ /(\d+)/
+num = $1 || "1"
 if node.attribute?('gce')
   gce_zone = node['gce']['instance']['zone'].split('/')[3].split("-")[2]
-  node.set['chef_metric_tank']['channel'] = "tank#{gce_zone}"
+  node.set['chef_metric_tank']['channel'] = "tank#{num}#{gce_zone}"
 else
-  node.name =~ /(\d+)/
-  num = $1 || "1"
   node.set['chef_metric_tank'']['channel'] = "tank#{num}"
 end
 
