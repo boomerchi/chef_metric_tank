@@ -1,3 +1,4 @@
+default[:use_statsd] = true
 default[:chef_metric_tank][:packagecloud_repo] = "raintank/raintank"
 default[:chef_metric_tank][:instance] = "default"
 default[:chef_metric_tank][:channel] = "tank"
