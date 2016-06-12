@@ -18,5 +18,5 @@
 #
 
 include_recipe "chef_base::default"
-include_recipe "chef_metric_tank::install"
 include_recipe "chef_metric_tank::collectd"
+include_recipe "chef_metric_tank::install"
