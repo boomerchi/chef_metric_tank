@@ -27,7 +27,7 @@ if node.attribute?('gce')
   gce_zone = node['gce']['instance']['zone'].split('/')[3].split("-")[2]
   node.set['chef_metric_tank']['channel'] = "tank#{num}#{gce_zone}"
 else
-  node.set['chef_metric_tank'']['channel'] = "tank#{num}"
+  node.set['chef_metric_tank']['channel'] = "tank#{num}"
 end
 
 tag("metric_tank")
