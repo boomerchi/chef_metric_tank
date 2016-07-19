@@ -45,7 +45,7 @@ else
   :install
 end
 
-package "metric-tank" do
+package "metrictank" do
   version pkg_version
   action pkg_action
   options "-o Dpkg::Options::='--force-confnew'"
@@ -54,7 +54,9 @@ end
 service "metric_tank" do
   case node["platform"]
   when "ubuntu"
-    if node["platform_version"].to_f >= 9.10
+    if node["platform_version"].to_f >= 15.10
+      provider Chef::Provider::Service::Systemd
+    elsif node["platform_version"].to_f >= 9.10
       provider Chef::Provider::Service::Upstart
     end
   end
@@ -81,8 +83,8 @@ directory node['chef_metric_tank']['proftrigger']['path'] do
   action :create
 end
 
-template "/etc/raintank/metric_tank.ini" do
-  source "metric_tank.ini.erb"
+template "/etc/raintank/metrictank.ini" do
+  source "metrictank.ini.erb"
   mode '0644'
   owner 'root'
   group 'root'
@@ -123,16 +125,17 @@ template "/etc/raintank/metric_tank.ini" do
 end
 
 tag("metric_tank")
+tag("metrictank")
 
-logrotate_app "metric_tank-upstart" do
-  path "/var/log/upstart/metric_tank.log"
-  frequency "hourly"
-  create "644 root root"
-  rotate 6
-  options %w(missingok compress copytruncate notifempty)
-  enable true
-end
-cron "metric_tank-upstart-logrotate" do
-  time :hourly
-  command "/usr/sbin/logrotate /etc/logrotate.d/metric_tank-upstart"
-end
+#logrotate_app "metric_tank-upstart" do
+#  path "/var/log/upstart/metric_tank.log"
+#  frequency "hourly"
+#  create "644 root root"
+#  rotate 6
+#  options %w(missingok compress copytruncate notifempty)
+#  enable true
+#end
+#cron "metric_tank-upstart-logrotate" do
+#  time :hourly
+#  command "/usr/sbin/logrotate /etc/logrotate.d/metric_tank-upstart"
+#end
