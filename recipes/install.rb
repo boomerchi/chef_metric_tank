@@ -51,7 +51,7 @@ package "metrictank" do
   options "-o Dpkg::Options::='--force-confnew'"
 end
 
-service "metric_tank" do
+service "metrictank" do
   case node["platform"]
   when "ubuntu"
     if node["platform_version"].to_f >= 15.10
