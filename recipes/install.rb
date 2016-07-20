@@ -102,11 +102,6 @@ template "/etc/raintank/metrictank.ini" do
     :accounting_period => node['chef_metric_tank']['accounting_period'],
     :primary_node => node['chef_metric_tank']['primary_node'],
     :warm_up_period => node['chef_metric_tank']['warm_up_period'],
-    :topic_notify_persist => node['chef_metric_tank']['topic_notify_persist'],
-    :channel => node['chef_metric_tank']['channel'],
-    :topic => node['chef_metric_tank']['topic'],
-    :max_in_flight => node['chef_metric_tank']['max_in_flight'],
-    :concurrency => node['chef_metric_tank']['concurrency'],
     :listen => node['chef_metric_tank']['listen'],
     :ttl => node['chef_metric_tank']['ttl'],
     :chunkspan => node['chef_metric_tank']['chunkspan'],
@@ -115,8 +110,9 @@ template "/etc/raintank/metrictank.ini" do
     :cassandra_write_concurrency => node['chef_metric_tank']['cassandra_write_concurrency'],
     :cassandra_write_queue_size => node['chef_metric_tank']['cassandra_write_queue_size'],
     :cassandra_read_concurrency => node['chef_metric_tank']['cassandra_read_concurrency'],
-    :cassandra_read_queue_size => node['chef_metric_tank']['cassandra_write_queue_size'],
+    :cassandra_read_queue_size => node['chef_metric_tank']['cassandra_read_queue_size'],
     :cassandra_consistency => node['chef_metric_tank']['cassandra_consistency'],
+    :cassandra_timeout => node['chef_metric_tank']['cassandra_timeout'],
     :nsqds => nsqd_addrs.join(','),
     :log_min_dur => node['chef_metric_tank']['log_min_dur'],
     :log_level => node['chef_metric_tank']['log_level'],
@@ -128,7 +124,6 @@ template "/etc/raintank/metrictank.ini" do
     :agg_settings => node['chef_metric_tank']['agg_settings'],
     :elastic_addr => elasticsearch_host + ":9200",
     :index_name =>  node['chef_metric_tank']['index_name'],
-    :cassandra_timeout => node['chef_metric_tank']['cassandra_timeout'],
     :proftrigger_heap => node['chef_metric_tank']['proftrigger']['heap_thresh'],
     :proftrigger_freq => node['chef_metric_tank']['proftrigger']['freq'],
     :proftrigger_path => node['chef_metric_tank']['proftrigger']['path'],
@@ -139,11 +134,12 @@ template "/etc/raintank/metrictank.ini" do
     :kafka_brokers => kafka_brokers,
     :kafka_group => node['chef_metric_tank']['kafka']['group'],
     :nsq_in_enabled => node['chef_metric_tank']['nsq_in']['enabled'].to_s,
-    :nsq_cluster_enabled => node['chef_metric_tank']['nsq_cluster']['_enabled'],
-    :carbon_in_enabled => node['chef_metric_tank']['carbon_in']['_enabled'],
-    :kafka_mdm_in_enabled => node['chef_metric_tank']['kafka_mdm_in']['_enabled'],
-    :kafka_mdam_in_enabled => node['chef_metric_tank']['kafka_mdam_in']['_enabled'],
-    :kafka_cluster_enabled => node['chef_metric_tank']['kafka_cluster']['_enabled']
+    :nsq_cluster_enabled => node['chef_metric_tank']['nsq_cluster']['enabled'],
+    :carbon_in_enabled => node['chef_metric_tank']['carbon_in']['enabled'],
+    :kafka_mdm_in_enabled => node['chef_metric_tank']['kafka_mdm_in']['enabled'],
+    :kafka_mdam_in_enabled => node['chef_metric_tank']['kafka_mdam_in']['enabled'],
+    :kafka_cluster_enabled => node['chef_metric_tank']['kafka_cluster']['enabled'],
+    :kafka_cluster_topic => node['chef_metric_tank']['kafka_cluster']['topic']
   })
 end
 

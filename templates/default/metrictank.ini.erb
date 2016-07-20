@@ -12,9 +12,6 @@ instance = <%= @instance %>
 # the primary node writes data to cassandra. There should only be 1 primary node per cluster of nodes
 primary-node = <%= @primary_node %>
 
-channel = <%= @channel %>
-topic = <%= @topic %>
-
 # duration before secondary nodes start serving requests
 warm-up-period = <%= @warm_up_period %>
 
@@ -131,7 +128,7 @@ enabled = <%= @kafka_cluster_enabled %>
 # tcp address (may be given multiple times as a comma-separated list)
 brokers = <%= @kafka_brokers %>
 # kafka topic (may be given multiple times as a comma-separated list)
-topics = <%= @kafka_topics %>
+topic = <%= @kafka_cluster_topic %>
 # consumer group name
 group = <%= @kafka_group %>
 
