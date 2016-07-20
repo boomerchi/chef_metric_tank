@@ -115,7 +115,7 @@ group = <%= @kafka_group %>
 enabled = <%= @kafka_mdam_in_enabled %>
 # tcp address (may be given multiple times as a comma-separated list)
 brokers = <%= @kafka_brokers %>
-# kafka topic (may be given multiple times as a comma-separated list)
+# kafka topic (only one)
 topics = <%= @kafka_topics %>
 # consumer group name
 group = <%= @kafka_group %>
@@ -127,7 +127,7 @@ group = <%= @kafka_group %>
 enabled = <%= @kafka_cluster_enabled %>
 # tcp address (may be given multiple times as a comma-separated list)
 brokers = <%= @kafka_brokers %>
-# kafka topic (may be given multiple times as a comma-separated list)
+# kafka topic (only one)
 topic = <%= @kafka_cluster_topic %>
 # consumer group name
 group = <%= @kafka_group %>
