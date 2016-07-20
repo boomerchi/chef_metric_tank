@@ -17,5 +17,5 @@
 # limitations under the License.
 #
 
-node.set["collectd_personality"] = "metric-tank"
+node.set["collectd_personality"] = "metrictank"
 include_recipe "chef_base::collectd"

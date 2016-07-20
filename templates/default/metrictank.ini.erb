@@ -1,43 +1,140 @@
 # config for metric_tank -- managed by Chef
+
+# tcp address for metrictank to bind to for its HTTP interface
+listen = <%= @listen %>
+
+# accounting period to track per-org usage metrics
+accounting-period = <%= @accounting_period %>
+
+## clustering:
+# cluster node name and value used to differentiate metrics between nodes
 instance = <%= @instance %>
+# the primary node writes data to cassandra. There should only be 1 primary node per cluster of nodes
 primary-node = <%= @primary_node %>
 
 channel = <%= @channel %>
 topic = <%= @topic %>
 
-topic-notify-persist = <%= @topic_notify_persist %>
+# duration before secondary nodes start serving requests
 warm-up-period = <%= @warm_up_period %>
 
-
-nsqd-tcp-address = <%= @nsqds %>
-max-in-flight = <%= @max_in_flight %>
-concurrency = <%= @concurrency %>
-
+## data:
+# duration of chunks
 chunkspan = <%= @chunkspan %>
+# number of chunks to keep in memory. should be at least 1 more than what's needed to satisfy aggregation rules
 numchunks = <%= @numchunks %>
-
-cassandra-addrs = <%= @cassandras %>
-cassandra-write-concurrency = <%= @cassandra_write_concurrency %>
-cassandra-write-queue-size = <%= @cassandra_write_queue_size %>
+# minimum wait before metrics are removed from storage
 ttl = <%= @ttl %>
 
-listen = <%= @listen %>
-
+# Interval to run garbage collection job
 gc-interval = <%= @gc_interval %>
+# max age for a chunk before to be considered stale and to be persisted to Cassandra
 chunk-max-stale = <%= @chunk_max_stale %>
+# max age for a metric before to be considered stale and to be purged from memory
 metric-max-stale = <%= @metric_max_stale %>
 
-log-level = <%= @log_level %>
-
-statsd-addr = <%= @statsd_addr %>
-statsd-type = <%= @statsd_type %>
-
+# settings for rollups (aggregation for archives)
+# comma-separated of archive specifications.
+# archive specification is of the form: aggSpan:chunkSpan:numChunks:TTL[:ready as bool. default true]
+# with these aggregation rules: 5min:1h:2:3mon,1h:6h:2:1y:false
+# 5 min of data, store in a chunk that lasts 1hour, keep 2 chunks in memory, keep for 3months in cassandra
+# 1hr worth of data, in chunks of 6 hours, 2 chunks in mem, keep for 1 year, but this series is not ready yet for querying.
 agg-settings = <%= @agg_settings %>
 
-elastic-addr = <%= @elastic_addr %>
-index-name = <%= @index_name %>
+### Metric data storage ###
+## cassandra
+# comma-separated list of hostnames to connect to
+cassandra-addrs = <%= @cassandras %>
+# max number of concurrent writes to cassandra
+cassandra-write-concurrency = <%= @cassandra_write_concurrency %>
+# write queue size per cassandra worker. should be large engough to hold all at least the total number of series expected, divided by how many workers you have
+cassandra-write-queue-size = <%= @cassandra_write_queue_size %>
+# max number of concurrent reads to cassandra
+cassandra-read-concurrency = <%= @cassandra_read_concurrency %>
+# max number of outstanding reads before blocking. value doesn't matter much
+cassandra-read-queue-size = <%= @cassandra_read_queue_size %>
+# cassandra timeout in milliseconds
 cassandra-timeout = <%= @cassandra_timeout %>
+# desired write consistency (any|one|two|three|quorum|all|local_quorum|each_quorum|local_one
+cassandra-consistency = <%= @cassandra_consistency %>
 
+
+### Metric metadata index ###
+
+## elasticsearch
+# elasticsearch address for metric definitions
+elastic-addr = <%= @elastic_addr %>
+# index name for storing metric index
+index-name = <%= @index_name %>
+
+### Profiling, instrumentation and logging ###
+
+# statsd address
+statsd-addr = <%= @statsd_addr %>
+# standard or datadog
+statsd-type = <%= @statsd_type %>
+
+# only log incoming requests if their timerange is at least this duration. Use 0 to disable
+log-min-dur = <%= @log_min_dur %>
+# only log log-level and higher. 0=TRACE|1=DEBUG|2=INFO|3=WARN|4=ERROR|5=CRITICAL|6=FATAL
+log-level = <%= @log_level %>
+
+# if this many bytes allocated, trigger a heap profile
 proftrigger-heap-thresh = <%= @proftrigger_heap %>
+# inspect status frequency. set to 0 to disable
 proftrigger-freq = <%= @proftrigger_freq %>
+# path to store triggered profile
 proftrigger-path = <%= @proftrigger_path %>
+# minimum time between triggered profiles
+proftrigger-min-diff = <%= @proftrigger_min_diff %>
+
+# see https://golang.org/pkg/runtime/#SetBlockProfileRate
+block-profile-rate = <%= @block_profile_rate %>
+# 0 to disable. 1 for max precision (expensive!) see https://golang.org/pkg/runtime/#pkg-variables")
+mem-profile-rate = <%= @mem_profile_rate %>
+
+### inputs section ###
+
+# NSQ input (discouraged)
+[nsq-in]
+enabled = <%= @nsq_in_enabled %>
+
+## carbon input (optional)
+[carbon-in]
+enabled = <%= @carbon_in_enabled %>
+
+## kafka-mdm input (optional, recommended)
+[kafka-mdm-in]
+enabled = <%= @kafka_mdm_in_enabled %>
+# tcp address (may be given multiple times as a comma-separated list)
+brokers = <%= @kafka_brokers %>
+# kafka topic (may be given multiple times as a comma-separated list)
+topics = <%= @kafka_topics %>
+# consumer group name
+group = <%= @kafka_group %>
+
+## kafka-mdam input (optional, discouraged)
+[kafka-mdam-in]
+enabled = <%= @kafka_mdam_in_enabled %>
+# tcp address (may be given multiple times as a comma-separated list)
+brokers = <%= @kafka_brokers %>
+# kafka topic (may be given multiple times as a comma-separated list)
+topics = <%= @kafka_topics %>
+# consumer group name
+group = <%= @kafka_group %>
+
+
+### clustering transports ###
+# kafka as transport for clustering messages (recommended)
+[kafka-cluster]
+enabled = <%= @kafka_cluster_enabled %>
+# tcp address (may be given multiple times as a comma-separated list)
+brokers = <%= @kafka_brokers %>
+# kafka topic (may be given multiple times as a comma-separated list)
+topics = <%= @kafka_topics %>
+# consumer group name
+group = <%= @kafka_group %>
+
+# nsq as transport for clustering messages
+[nsq-cluster]
+enabled = <%= @nsq_cluster_enabled %>
