@@ -147,7 +147,7 @@ template "/etc/raintank/metrictank.ini" do
     :es_hosts => elasticsearch_host,
     :es_index =>  node['chef_metric_tank']['elasticsearch_idx']['index'],
     :es_retry_interval => node['chef_metric_tank']['elasticsearch_idx']['retry_interval'],
-    :es_nax_buffer_docs => node['chef_metric_tank']['elasticsearch_idx']['nax_buffer_docs'],
+    :es_max_buffer_docs => node['chef_metric_tank']['elasticsearch_idx']['max_buffer_docs'],
     :es_max_conns => node['chef_metric_tank']['elasticsearch_idx']['max_conns'],
     :buffer_delay_max => node['chef_metric_tank']['elasticsearch_idx']['buffer_delay_max']
   })

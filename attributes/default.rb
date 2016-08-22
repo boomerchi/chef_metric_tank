@@ -50,7 +50,7 @@ default[:chef_metric_tank][:elasticsearch_idx][:index] = "metric"
 default[:chef_metric_tank][:elasticsearch_idx][:hosts] = "localhost:9200"
 default[:chef_metric_tank][:elasticsearch_idx][:retry_interval] = "1h"
 default[:chef_metric_tank][:elasticsearch_idx][:max_conns] = 20
-default[:chef_metric_tank][:elasticsearch_idx][:nax_buffer_docs] = 1000
+default[:chef_metric_tank][:elasticsearch_idx][:max_buffer_docs] = 1000
 default[:chef_metric_tank][:elasticsearch_idx][:buffer_delay_max] = "10s"
 
 default[:chef_metric_tank][:log_level] = 2
