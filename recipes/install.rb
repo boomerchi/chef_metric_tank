@@ -65,7 +65,13 @@ end
 
 nsqd_addrs = find_nsqd || node['chef_metric_tank']['nsqd_addr']
 cassandra_addrs = find_cassandras
-elasticsearch_host = find_haproxy || node['chef_metric_tank']['elasticsearch_host']
+elasticsearch_host = find_haproxy || ""
+
+elasticsearch_host = if elasticsearch_host == ""
+  node['chef_metric_tank']['elasticsearch_idx']['hosts']
+else
+  elasticsearch_host + ":9200"
+end
 
 directory "/etc/raintank" do
   owner "root"
@@ -122,8 +128,6 @@ template "/etc/raintank/metrictank.ini" do
     :statsd_addr => node['chef_metric_tank']['statsd_addr'],
     :statsd_type => node['chef_metric_tank']['statsd_type'],
     :agg_settings => node['chef_metric_tank']['agg_settings'],
-    :elastic_addr => elasticsearch_host + ":9200",
-    :index_name =>  node['chef_metric_tank']['index_name'],
     :proftrigger_heap => node['chef_metric_tank']['proftrigger']['heap_thresh'],
     :proftrigger_freq => node['chef_metric_tank']['proftrigger']['freq'],
     :proftrigger_path => node['chef_metric_tank']['proftrigger']['path'],
@@ -139,7 +143,13 @@ template "/etc/raintank/metrictank.ini" do
     :kafka_mdm_in_enabled => node['chef_metric_tank']['kafka_mdm_in']['enabled'],
     :kafka_mdam_in_enabled => node['chef_metric_tank']['kafka_mdam_in']['enabled'],
     :kafka_cluster_enabled => node['chef_metric_tank']['kafka_cluster']['enabled'],
-    :kafka_cluster_topic => node['chef_metric_tank']['kafka_cluster']['topic']
+    :kafka_cluster_topic => node['chef_metric_tank']['kafka_cluster']['topic'],
+    :es_hosts => elasticsearch_host,
+    :es_index =>  node['chef_metric_tank']['elasticsearch_idx']['index'],
+    :es_retry_interval => node['chef_metric_tank']['elasticsearch_idx']['retry_interval'],
+    :es_nax_buffer_docs => node['chef_metric_tank']['elasticsearch_idx']['nax_buffer_docs'],
+    :es_max_conns => node['chef_metric_tank']['elasticsearch_idx']['max_conns'],
+    :buffer_delay_max => node['chef_metric_tank']['elasticsearch_idx']['buffer_delay_max']
   })
 end
 

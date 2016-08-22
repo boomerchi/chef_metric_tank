@@ -46,10 +46,12 @@ default[:chef_metric_tank][:cassandra_read_concurrency] = 20
 default[:chef_metric_tank][:cassandra_read_queue_size] = 100
 default[:chef_metric_tank][:cassandra_timeout] = 1000
 
-default[:chef_metric_tank][:index_name] = "metric"
-default[:chef_metric_tank][:elastic_addr] = "localhost:9200"
-default[:chef_metric_tank][:elasticsearch_host] = "localhost"
-
+default[:chef_metric_tank][:elasticsearch_idx][:index] = "metric"
+default[:chef_metric_tank][:elasticsearch_idx][:hosts] = "localhost:9200"
+default[:chef_metric_tank][:elasticsearch_idx][:retry_interval] = "1h"
+default[:chef_metric_tank][:elasticsearch_idx][:max_conns] = 20
+default[:chef_metric_tank][:elasticsearch_idx][:nax_buffer_docs] = 1000
+default[:chef_metric_tank][:elasticsearch_idx][:buffer_delay_max] = "10s"
 
 default[:chef_metric_tank][:log_level] = 2
 default[:chef_metric_tank][:log_min_dur] = "5min"

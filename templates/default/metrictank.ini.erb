@@ -56,14 +56,6 @@ cassandra-timeout = <%= @cassandra_timeout %>
 cassandra-consistency = <%= @cassandra_consistency %>
 
 
-### Metric metadata index ###
-
-## elasticsearch
-# elasticsearch address for metric definitions
-elastic-addr = <%= @elastic_addr %>
-# index name for storing metric index
-index-name = <%= @index_name %>
-
 ### Profiling, instrumentation and logging ###
 
 # statsd address
@@ -135,3 +127,21 @@ group = <%= @kafka_group %>
 # nsq as transport for clustering messages
 [nsq-cluster]
 enabled = <%= @nsq_cluster_enabled %>
+
+
+### Metric metadata index ###
+
+[elasticsearch-idx]
+enabled = true
+# elasticsearch index name to use
+index = <%= @es_index %>
+# Elasticsearch host addresses (multiple hosts can be specified as comma-separated list)
+hosts = <%= @es_hosts %>
+# how often the retry buffer should be flushed to ES
+retry-interval = <%= @es_retry_interval %>
+# max number of concurrent connections to ES
+max-conns = <%= @es_max_conns %>
+# max numver of docs to keep in the BulkIndexer buffer
+max-buffer-docs = <%= @es_max_buffer_docs %>
+# max delay befoer the BulkIndexer flushes its buffer
+buffer-delay-max = <%= @buffer_delay_max %>
