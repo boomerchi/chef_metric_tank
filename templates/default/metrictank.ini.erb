@@ -42,6 +42,8 @@ agg-settings = <%= @agg_settings %>
 ## cassandra
 # comma-separated list of hostnames to connect to
 cassandra-addrs = <%= @cassandras %>
+# keyspace to use for storing the metric data table
+cassandra_keyspace = <%= @cassandra_keyspace %>
 # max number of concurrent writes to cassandra
 cassandra-write-concurrency = <%= @cassandra_write_concurrency %>
 # write queue size per cassandra worker. should be large engough to hold all at least the total number of series expected, divided by how many workers you have

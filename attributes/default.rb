@@ -40,6 +40,7 @@ default[:chef_metric_tank][:warm_up_period] = "1h"
 default[:chef_metric_tank][:agg_settings] = ""
 
 default[:chef_metric_tank][:cassandra_consistency] = "one"
+default[:chef_metric_tank][:cassandra_keyspace] = "raintank"
 default[:chef_metric_tank][:cassandra_write_concurrency] = 10
 default[:chef_metric_tank][:cassandra_write_queue_size] = 100000
 default[:chef_metric_tank][:cassandra_read_concurrency] = 20

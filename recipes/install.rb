@@ -119,6 +119,7 @@ template "/etc/raintank/metrictank.ini" do
     :cassandra_read_queue_size => node['chef_metric_tank']['cassandra_read_queue_size'],
     :cassandra_consistency => node['chef_metric_tank']['cassandra_consistency'],
     :cassandra_timeout => node['chef_metric_tank']['cassandra_timeout'],
+    :cassandra_keyspace => node['chef_metric_tank']['cassandra_keyspace'],
     :nsqds => nsqd_addrs.join(','),
     :log_min_dur => node['chef_metric_tank']['log_min_dur'],
     :log_level => node['chef_metric_tank']['log_level'],
