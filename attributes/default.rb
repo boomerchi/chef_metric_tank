@@ -57,8 +57,8 @@ default[:chef_metric_tank][:elasticsearch_idx][:max_buffer_docs] = 1000
 default[:chef_metric_tank][:elasticsearch_idx][:buffer_delay_max] = "10s"
 
 default[:chef_metric_tank][:cassandra_idx][:enabled] = false
-default[:chef_metric_tank][:elasticsearch_idx][:num_conns] = 10
-default[:chef_metric_tank][:elasticsearch_idx][:write_queue_size] = 1000000
+default[:chef_metric_tank][:cassandra_idx][:num_conns] = 10
+default[:chef_metric_tank][:cassandra_idx][:write_queue_size] = 1000000
 
 default[:chef_metric_tank][:log_level] = 2
 default[:chef_metric_tank][:log_min_dur] = "5min"
