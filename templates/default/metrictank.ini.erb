@@ -132,9 +132,11 @@ enabled = <%= @nsq_cluster_enabled %>
 
 
 ### Metric metadata index ###
+[memory-idx]
+enabled = false
 
 [elasticsearch-idx]
-enabled = true
+enabled = <%= @es_index_enabled %>
 # elasticsearch index name to use
 index = <%= @es_index %>
 # Elasticsearch host addresses (multiple hosts can be specified as comma-separated list)
@@ -147,3 +149,20 @@ max-conns = <%= @es_max_conns %>
 max-buffer-docs = <%= @es_max_buffer_docs %>
 # max delay befoer the BulkIndexer flushes its buffer
 buffer-delay-max = <%= @buffer_delay_max %>
+
+[cassandra-idx]
+enabled = <%= @cassandra_index_enabled %>
+# Cassandra keyspace to store metricDefinitions in.
+keyspace = <%= @cassandra_keyspace %>
+# comma separated list of cassandra addresses in host:port form
+hosts = <%= @cassandras %>
+#cql protocol version to use
+protocol-version = 4
+# write consistency (any|one|two|three|quorum|all|local_quorum|each_quorum|local_one
+consistency = <%= @cassandra_consistency %>
+# cassandra request timeout
+timout = <%= @cassandra_timeout %>
+# number of concurrent connections to cassandra
+num-conns = <%= @cassandra_idx_num_conns %>
+# Max number of metricDefs allowed to be unwritten to cassandra
+write-queue-size = <%= @cassandra_idx_write_queue %>

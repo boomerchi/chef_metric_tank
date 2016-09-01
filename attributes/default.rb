@@ -47,12 +47,18 @@ default[:chef_metric_tank][:cassandra_read_concurrency] = 20
 default[:chef_metric_tank][:cassandra_read_queue_size] = 100
 default[:chef_metric_tank][:cassandra_timeout] = 1000
 
+
+default[:chef_metric_tank][:elasticsearch_idx][:enabled] = true
 default[:chef_metric_tank][:elasticsearch_idx][:index] = "metric"
 default[:chef_metric_tank][:elasticsearch_idx][:hosts] = "localhost:9200"
 default[:chef_metric_tank][:elasticsearch_idx][:retry_interval] = "1h"
 default[:chef_metric_tank][:elasticsearch_idx][:max_conns] = 20
 default[:chef_metric_tank][:elasticsearch_idx][:max_buffer_docs] = 1000
 default[:chef_metric_tank][:elasticsearch_idx][:buffer_delay_max] = "10s"
+
+default[:chef_metric_tank][:cassandra_idx][:enabled] = false
+default[:chef_metric_tank][:elasticsearch_idx][:num_conns] = 10
+default[:chef_metric_tank][:elasticsearch_idx][:write_queue_size] = 1000000
 
 default[:chef_metric_tank][:log_level] = 2
 default[:chef_metric_tank][:log_min_dur] = "5min"

@@ -145,12 +145,16 @@ template "/etc/raintank/metrictank.ini" do
     :kafka_mdam_in_enabled => node['chef_metric_tank']['kafka_mdam_in']['enabled'],
     :kafka_cluster_enabled => node['chef_metric_tank']['kafka_cluster']['enabled'],
     :kafka_cluster_topic => node['chef_metric_tank']['kafka_cluster']['topic'],
+    :es_index_enabled => node['chef_metric_tank']['elasticsearch_idx']['enabled']
     :es_hosts => elasticsearch_host,
     :es_index =>  node['chef_metric_tank']['elasticsearch_idx']['index'],
     :es_retry_interval => node['chef_metric_tank']['elasticsearch_idx']['retry_interval'],
     :es_max_buffer_docs => node['chef_metric_tank']['elasticsearch_idx']['max_buffer_docs'],
     :es_max_conns => node['chef_metric_tank']['elasticsearch_idx']['max_conns'],
-    :buffer_delay_max => node['chef_metric_tank']['elasticsearch_idx']['buffer_delay_max']
+    :buffer_delay_max => node['chef_metric_tank']['elasticsearch_idx']['buffer_delay_max'],
+    :cassandra_index_enabled => node['chef_metric_tank']['cassandra_idx']['enabled']
+    :cassandra_idx_num_conns => node['chef_metric_tank']['cassandra_idx']['num_conns'],
+    :cassandra_idx_write_queue => node['chef_metric_tank']['cassandra_idx']['write_queue_size']
   })
 end
 
