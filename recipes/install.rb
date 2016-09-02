@@ -152,7 +152,7 @@ template "/etc/raintank/metrictank.ini" do
     :es_max_buffer_docs => node['chef_metric_tank']['elasticsearch_idx']['max_buffer_docs'],
     :es_max_conns => node['chef_metric_tank']['elasticsearch_idx']['max_conns'],
     :buffer_delay_max => node['chef_metric_tank']['elasticsearch_idx']['buffer_delay_max'],
-    :cassandra_index_enabled => node['chef_metric_tank']['cassandra_idx']['enabled']
+    :cassandra_index_enabled => node['chef_metric_tank']['cassandra_idx']['enabled'],
     :cassandra_idx_num_conns => node['chef_metric_tank']['cassandra_idx']['num_conns'],
     :cassandra_idx_write_queue => node['chef_metric_tank']['cassandra_idx']['write_queue_size']
   })
