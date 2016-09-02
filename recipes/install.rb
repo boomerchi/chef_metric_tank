@@ -145,7 +145,7 @@ template "/etc/raintank/metrictank.ini" do
     :kafka_mdam_in_enabled => node['chef_metric_tank']['kafka_mdam_in']['enabled'],
     :kafka_cluster_enabled => node['chef_metric_tank']['kafka_cluster']['enabled'],
     :kafka_cluster_topic => node['chef_metric_tank']['kafka_cluster']['topic'],
-    :es_index_enabled => node['chef_metric_tank']['elasticsearch_idx']['enabled']
+    :es_index_enabled => node['chef_metric_tank']['elasticsearch_idx']['enabled'],
     :es_hosts => elasticsearch_host,
     :es_index =>  node['chef_metric_tank']['elasticsearch_idx']['index'],
     :es_retry_interval => node['chef_metric_tank']['elasticsearch_idx']['retry_interval'],
