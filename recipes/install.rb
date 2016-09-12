@@ -23,17 +23,6 @@ Chef::Provider.send(:include, ::RaintankBase::Helpers)
 
 node.set['metrictank']['instance'] = node['hostname']
 
-# zone format:  projects/417965514133/zones/us-central1-a.
-# we split to us-central1-a, then split that to get just "a"
-node.name =~ /(\d+)/
-num = $1 || "1"
-if node.attribute?('gce')
-  gce_zone = node['gce']['instance']['zone'].split('/')[3].split("-")[2]
-  node.set['metrictank']['channel'] = "tank#{num}#{gce_zone}"
-else
-  node.set['metrictank']['channel'] = "tank#{num}"
-end
-
 packagecloud_repo node[:metrictank][:packagecloud_repo] do
   type "deb"
 end
@@ -61,16 +50,6 @@ service "metrictank" do
     end
   end
   action [ :enable, :start ]
-end
-
-nsqd_addrs = find_nsqd || node['metrictank']['nsqd_addr']
-cassandra_addrs = find_cassandras
-elasticsearch_host = find_haproxy || ""
-
-elasticsearch_host = if elasticsearch_host == ""
-  node['metrictank']['elasticsearch_idx']['hosts']
-else
-  elasticsearch_host + ":9200"
 end
 
 directory "/etc/raintank" do
@@ -110,16 +89,3 @@ end
 
 tag("metric_tank")
 tag("metrictank")
-
-#logrotate_app "metric_tank-upstart" do
-#  path "/var/log/upstart/metric_tank.log"
-#  frequency "hourly"
-#  create "644 root root"
-#  rotate 6
-#  options %w(missingok compress copytruncate notifempty)
-#  enable true
-#end
-#cron "metric_tank-upstart-logrotate" do
-#  time :hourly
-#  command "/usr/sbin/logrotate /etc/logrotate.d/metric_tank-upstart"
-#end
