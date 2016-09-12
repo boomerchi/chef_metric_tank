@@ -1,34 +1,39 @@
 # config for metric_tank -- managed by Chef
 
+## misc ##
+
 # tcp address for metrictank to bind to for its HTTP interface
 listen = <%= @listen %>
 
 # accounting period to track per-org usage metrics
 accounting-period = <%= @accounting_period %>
 
-## clustering:
+## clustering ##
+
 # cluster node name and value used to differentiate metrics between nodes
 instance = <%= @instance %>
 # the primary node writes data to cassandra. There should only be 1 primary node per cluster of nodes
 primary-node = <%= @primary_node %>
 
-# duration before secondary nodes start serving requests
-warm-up-period = <%= @warm_up_period %>
+## data ##
 
-## data:
-# duration of chunks
+# see https://github.com/raintank/metrictank/blob/master/docs/data-knobs.md for more details
+# duration of raw chunks. e.g. 10min, 30min, 1h, 90min...
 chunkspan = <%= @chunkspan %>
-# number of chunks to keep in memory. should be at least 1 more than what's needed to satisfy aggregation rules
+# number of raw chunks to keep in memory. should be at least 1 more than what's needed to satisfy aggregation rules
 numchunks = <%= @numchunks %>
-# minimum wait before metrics are removed from storage
+# minimum wait before raw metrics are removed from storage
 ttl = <%= @ttl %>
 
-# Interval to run garbage collection job
-gc-interval = <%= @gc_interval %>
 # max age for a chunk before to be considered stale and to be persisted to Cassandra
 chunk-max-stale = <%= @chunk_max_stale %>
 # max age for a metric before to be considered stale and to be purged from memory
 metric-max-stale = <%= @metric_max_stale %>
+# Interval to run garbage collection job
+gc-interval = <%= @gc_interval %>
+
+# duration before secondary nodes start serving requests
+warm-up-period = <%= @warm_up_period %>
 
 # settings for rollups (aggregation for archives)
 # comma-separated of archive specifications.
@@ -38,131 +43,177 @@ metric-max-stale = <%= @metric_max_stale %>
 # 1hr worth of data, in chunks of 6 hours, 2 chunks in mem, keep for 1 year, but this series is not ready yet for querying.
 agg-settings = <%= @agg_settings %>
 
-### Metric data storage ###
-## cassandra
+
+## http api ##
+
+# limit on how many points could be requested in one request. 1M allows 500 series at a MaxDataPoints of 2000. (0 disables limit)
+max-points-per-req = <%= @max_points_per_req %>
+# limit on what kind of time range can be requested in one request. the default allows 500 series of 2 years. (0 disables limit)
+max-days-per-req = <%= @max_days_per_req %>
+
+
+## metric data storage in cassandra ##
+
 # comma-separated list of hostnames to connect to
-cassandra-addrs = <%= @cassandras %>
+cassandra-addrs = <%= @cassandra_addrs %>
 # keyspace to use for storing the metric data table
-cassandra_keyspace = <%= @cassandra_keyspace %>
-# max number of concurrent writes to cassandra
-cassandra-write-concurrency = <%= @cassandra_write_concurrency %>
-# write queue size per cassandra worker. should be large engough to hold all at least the total number of series expected, divided by how many workers you have
-cassandra-write-queue-size = <%= @cassandra_write_queue_size %>
-# max number of concurrent reads to cassandra
-cassandra-read-concurrency = <%= @cassandra_read_concurrency %>
-# max number of outstanding reads before blocking. value doesn't matter much
-cassandra-read-queue-size = <%= @cassandra_read_queue_size %>
-# cassandra timeout in milliseconds
-cassandra-timeout = <%= @cassandra_timeout %>
+cassandra-keyspace = <%= @cassandra_keyspace %>
 # desired write consistency (any|one|two|three|quorum|all|local_quorum|each_quorum|local_one
 cassandra-consistency = <%= @cassandra_consistency %>
+# cassandra timeout in milliseconds
+cassandra-timeout = <%= @cassandra_timeout %>
+# max number of concurrent reads to cassandra
+cassandra-read-concurrency = <%= @cassandra_read_concurrency %>
+# max number of concurrent writes to cassandra
+cassandra-write-concurrency = <%= @cassandra_write_concurrency %>
+# max number of outstanding reads before blocking. value doesn't matter much
+cassandra-read-queue-size = <%= @cassandra_read_queue_size %>
+# write queue size per cassandra worker. should be large engough to hold all at least the total number of series expected, divided by how many workers you have
+cassandra-write-queue-size = <%= @cassandra_write_queue_size %>
+# CQL protocol version. cassandra 3.x needs v3 or 4.
+cql-protocol-version = <%= @cql_protocol_version %>
 
-
-### Profiling, instrumentation and logging ###
-
-# statsd address
-statsd-addr = <%= @statsd_addr %>
-# standard or datadog
-statsd-type = <%= @statsd_type %>
-
-# only log incoming requests if their timerange is at least this duration. Use 0 to disable
-log-min-dur = <%= @log_min_dur %>
-# only log log-level and higher. 0=TRACE|1=DEBUG|2=INFO|3=WARN|4=ERROR|5=CRITICAL|6=FATAL
-log-level = <%= @log_level %>
-
-# if this many bytes allocated, trigger a heap profile
-proftrigger-heap-thresh = <%= @proftrigger_heap %>
-# inspect status frequency. set to 0 to disable
-proftrigger-freq = <%= @proftrigger_freq %>
-# path to store triggered profile
-proftrigger-path = <%= @proftrigger_path %>
-# minimum time between triggered profiles
-proftrigger-min-diff = <%= @proftrigger_min_diff %>
+## Profiling, instrumentation and logging ##
 
 # see https://golang.org/pkg/runtime/#SetBlockProfileRate
 block-profile-rate = <%= @block_profile_rate %>
 # 0 to disable. 1 for max precision (expensive!) see https://golang.org/pkg/runtime/#pkg-variables")
 mem-profile-rate = <%= @mem_profile_rate %>
 
-### inputs section ###
+# enable sending statsd messages for instrumentation
+statsd-enabled = <%= @statsd_enabled %>
+# statsd address
+statsd-addr = <%= @statsd_addr %>
+# standard or datadog
+statsd-type = <%= @statsd_type %>
 
-# NSQ input (discouraged)
+# inspect status frequency. set to 0 to disable
+proftrigger-freq = <%= @proftrigger_freq %>
+# path to store triggered profiles
+proftrigger-path = <%= @proftrigger_path %>
+# minimum time between triggered profiles
+proftrigger-min-diff = <%= @proftrigger_min_diff %>
+# if this many bytes allocated, trigger a heap profile
+proftrigger-heap-thresh = <%= @proftrigger_heap_thresh %>
+
+# only log incoming requests if their timerange is at least this duration. Use 0 to disable
+log-min-dur = <%= @log_min_dur %>
+
+# only log log-level and higher. 0=TRACE|1=DEBUG|2=INFO|3=WARN|4=ERROR|5=CRITICAL|6=FATAL
+log-level = <%= @log_level %>
+
+
+## metric data inputs ##
+
+### NSQ input (discouraged)
 [nsq-in]
-enabled = <%= @nsq_in_enabled %>
+enabled = false
 
-## carbon input (optional)
+### carbon input (optional)
 [carbon-in]
 enabled = <%= @carbon_in_enabled %>
+# tcp address
+addr = <%= @carbon_in_addr %>
+# needed to know your raw resolution for your metrics. see http://graphite.readthedocs.io/en/latest/config-carbon.html#storage-schemas-conf
+# NOTE: does NOT use aggregation and retention settings from this file.  We use agg-settings and ttl for that.
+schemas-file = <%= @carbon_in_schemas_file %>
 
-## kafka-mdm input (optional, recommended)
+### kafka-mdm input (optional, recommended)
 [kafka-mdm-in]
 enabled = <%= @kafka_mdm_in_enabled %>
 # tcp address (may be given multiple times as a comma-separated list)
-brokers = <%= @kafka_brokers %>
+brokers = <%= @kafka_mdm_in_brokers %>
 # kafka topic (may be given multiple times as a comma-separated list)
-topics = <%= @kafka_topics %>
-# consumer group name
-group = <%= @kafka_group %>
+topics = <%= @kafka_mdm_in_topics %>
+# offset to start consuming from. Can be one of newest, oldest,last or a time duration
+offset = <%= @kafka_mdm_in_offset %>
+# save interval for offsets
+offset-commit-interval = <%= @kafka_mdm_in_offset_commit_interval %>
+# directory to store partition offsets index. supports relative or absolute paths. empty means working dir.
+# it will be created (incl parent dirs) if not existing.
+data-dir = <%= @kafka_mdm_in_data_dir %>
+# The minimum number of message bytes to fetch in a request
+consumer-fetch-min = <%= @kafka_mdm_in_consumer_fetch_min %>
+# The default number of message bytes to fetch in a request
+consumer-fetch-default = <%= @kafka_mdm_in_consumer_fetch_default %>
+# The maximum amount of time the broker will wait for Consumer.Fetch.Min bytes to become available before it
+consumer-max-wait-time = <%= @kafka_mdm_in_consumer_max_wait_time %>
+#The maximum amount of time the consumer expects a message takes to process
+consumer-max-processing-time = <%= @kafka_mdm_in_consumer_max_processing_time %>
+# How many outstanding requests a connection is allowed to have before sending on it blocks
+net-max-open-requests = <%= @kafka_mdm_in_net_max_open_requests %>
 
-## kafka-mdam input (optional, discouraged)
+### kafka-mdam input (optional, discouraged)
 [kafka-mdam-in]
 enabled = <%= @kafka_mdam_in_enabled %>
 # tcp address (may be given multiple times as a comma-separated list)
-brokers = <%= @kafka_brokers %>
-# kafka topic (only one)
-topics = <%= @kafka_topics %>
+brokers = <%= @kafka_mdam_in_brokers %>
+# kafka topic (may be given multiple times as a comma-separated list)
+topics = <%= @kafka_mdam_in_topics %>
 # consumer group name
-group = <%= @kafka_group %>
+group = <%= @kafka_mdam_in_group %>
 
 
-### clustering transports ###
-# kafka as transport for clustering messages (recommended)
+## clustering transports ##
+
+### kafka as transport for clustering messages (recommended)
 [kafka-cluster]
 enabled = <%= @kafka_cluster_enabled %>
 # tcp address (may be given multiple times as a comma-separated list)
-brokers = <%= @kafka_brokers %>
+brokers = <%= @kafka_cluster_brokers %>
 # kafka topic (only one)
 topic = <%= @kafka_cluster_topic %>
-# consumer group name
-group = <%= @kafka_group %>
+# offset to start consuming from. Can be one of newest, oldest,last or a time duration
+offset = <%= @kafka_cluster_offset %>
+# save interval for offsets
+offset-commit-interval = <%= kafka_cluster_offset_commit_interval %>
+# directory to store partition offsets index. supports relative or absolute paths. empty means working dir.
+# it will be created (incl parent dirs) if not existing.
+data-dir = <%= @kafka_cluster_data_dir %>
 
-# nsq as transport for clustering messages
+### nsq as transport for clustering messages
 [nsq-cluster]
-enabled = <%= @nsq_cluster_enabled %>
-
-
-### Metric metadata index ###
-[memory-idx]
 enabled = false
 
-[elasticsearch-idx]
-enabled = <%= @es_index_enabled %>
-# elasticsearch index name to use
-index = <%= @es_index %>
-# Elasticsearch host addresses (multiple hosts can be specified as comma-separated list)
-hosts = <%= @es_hosts %>
-# how often the retry buffer should be flushed to ES
-retry-interval = <%= @es_retry_interval %>
-# max number of concurrent connections to ES
-max-conns = <%= @es_max_conns %>
-# max numver of docs to keep in the BulkIndexer buffer
-max-buffer-docs = <%= @es_max_buffer_docs %>
-# max delay befoer the BulkIndexer flushes its buffer
-buffer-delay-max = <%= @buffer_delay_max %>
+## metric metadata index ##
 
+### in-memory
+[memory-idx]
+enabled = <%= @memory_idx_enabled %>
+
+### in memory, elasticsearch-backed
+[elasticsearch-idx]
+enabled = <%= @elasticsearch_idx_enabled %>
+# elasticsearch index name to use
+index = <%= @elasticsearch_idx_index %>
+# Elasticsearch host addresses (multiple hosts can be specified as comma-separated list)
+hosts = <%= @elasticsearch_idx_hosts %>
+# http basic auth
+user = <%= @elasticsearch_idx_user %>
+pass = <%= @elasticsearch_idx_pass %>
+# how often the retry buffer should be flushed to ES. Valid units are "s", "m", "h"
+retry-interval = <%= @elasticsearch_idx_retry_interval %>
+# max number of concurrent connections to ES
+max-conns = <%= @elasticsearch_idx_max_conns %>
+# max numver of docs to keep in the BulkIndexer buffer
+max-buffer-docs = <%= @elasticsearch_idx_max_buffer_docs %>
+# max delay befoer the BulkIndexer flushes its buffer
+buffer-delay-max = <%= @elasticsearch_idx_buffer_delay_max %>
+
+### in memory, cassandra-backed
 [cassandra-idx]
-enabled = <%= @cassandra_index_enabled %>
+enabled = <%= @cassandra_idx_enabled %>
 # Cassandra keyspace to store metricDefinitions in.
-keyspace = <%= @cassandra_keyspace %>
+keyspace = <%= @cassandra_idx_keyspace %>
 # comma separated list of cassandra addresses in host:port form
-hosts = <%= @cassandras %>
+hosts = <%= @cassandra_idx_hosts %>
 #cql protocol version to use
-protocol-version = 4
+protocol-version = <%= @cassandra_idx_protocol_version %>
 # write consistency (any|one|two|three|quorum|all|local_quorum|each_quorum|local_one
-consistency = <%= @cassandra_consistency %>
+consistency = <%= @cassandra_idx_consistency %>
 # cassandra request timeout
-timout = <%= @cassandra_timeout %>
+timout = <%= @cassandra_idx_timeout %>
 # number of concurrent connections to cassandra
 num-conns = <%= @cassandra_idx_num_conns %>
 # Max number of metricDefs allowed to be unwritten to cassandra
-write-queue-size = <%= @cassandra_idx_write_queue %>
+write-queue-size = <%= @cassandra_idx_write_queue_size %>
