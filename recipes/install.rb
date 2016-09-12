@@ -1,5 +1,5 @@
 #
-# Cookbook Name:: chef_metric_tank
+# Cookbook Name:: metrictank
 # Recipe:: install
 #
 # Copyright (C) 2016 Raintank, Inc.
@@ -21,7 +21,7 @@ Chef::Recipe.send(:include, ::RaintankBase::Helpers)
 Chef::Resource.send(:include, ::RaintankBase::Helpers)
 Chef::Provider.send(:include, ::RaintankBase::Helpers)
 
-node.set['chef_metric_tank']['instance'] = node['hostname']
+node.set['metrictank']['instance'] = node['hostname']
 
 # zone format:  projects/417965514133/zones/us-central1-a.
 # we split to us-central1-a, then split that to get just "a"
@@ -29,16 +29,16 @@ node.name =~ /(\d+)/
 num = $1 || "1"
 if node.attribute?('gce')
   gce_zone = node['gce']['instance']['zone'].split('/')[3].split("-")[2]
-  node.set['chef_metric_tank']['channel'] = "tank#{num}#{gce_zone}"
+  node.set['metrictank']['channel'] = "tank#{num}#{gce_zone}"
 else
-  node.set['chef_metric_tank']['channel'] = "tank#{num}"
+  node.set['metrictank']['channel'] = "tank#{num}"
 end
 
-packagecloud_repo node[:chef_metric_tank][:packagecloud_repo] do
+packagecloud_repo node[:metrictank][:packagecloud_repo] do
   type "deb"
 end
 
-pkg_version = node['chef_metric_tank']['version']
+pkg_version = node['metrictank']['version']
 pkg_action = if pkg_version.nil?
   :upgrade
 else
@@ -63,12 +63,12 @@ service "metrictank" do
   action [ :enable, :start ]
 end
 
-nsqd_addrs = find_nsqd || node['chef_metric_tank']['nsqd_addr']
+nsqd_addrs = find_nsqd || node['metrictank']['nsqd_addr']
 cassandra_addrs = find_cassandras
 elasticsearch_host = find_haproxy || ""
 
 elasticsearch_host = if elasticsearch_host == ""
-  node['chef_metric_tank']['elasticsearch_idx']['hosts']
+  node['metrictank']['elasticsearch_idx']['hosts']
 else
   elasticsearch_host + ":9200"
 end
@@ -81,7 +81,7 @@ directory "/etc/raintank" do
   action :create
 end
 
-directory node['chef_metric_tank']['proftrigger']['path'] do
+directory node['metrictank']['proftrigger']['path'] do
   owner "root"
   group "root"
   mode "0755"
@@ -90,11 +90,11 @@ directory node['chef_metric_tank']['proftrigger']['path'] do
 end
 
 kafkas = if Chef::Config[:solo]
-    node['chef_metric_tank']['kafkas']
+    node['metrictank']['kafkas']
   else
-    search("node", node['chef_metric_tank']['kafka_search']).map { |c| c.fqdn }.sort || node['chef_metric_tank']['kafkas']
+    search("node", node['metrictank']['kafka_search']).map { |c| c.fqdn }.sort || node['metrictank']['kafkas']
   end
-kafka_brokers = kafkas.map { |k| "#{k}:#{node['chef_metric_tank']['kafka']['kafka_port']}" }.join(",")
+kafka_brokers = kafkas.map { |k| "#{k}:#{node['metrictank']['kafka']['kafka_port']}" }.join(",")
 node['metrictank']['kafka_mdm_in_brokers'] = kafka_brokers
 node['metrictank']['kafka_mdam_in_brokers'] = kafka_brokers
 node['metrictank']['kafka_cluster_brokers'] = kafka_brokers

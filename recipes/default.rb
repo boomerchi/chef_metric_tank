@@ -1,5 +1,5 @@
 #
-# Cookbook Name:: chef_metric_tank
+# Cookbook Name:: metrictank
 # Recipe:: default
 #
 # Copyright (C) 2016 Raintank, Inc.
@@ -18,5 +18,5 @@
 #
 
 include_recipe "chef_base::default"
-include_recipe "chef_metric_tank::collectd"
-include_recipe "chef_metric_tank::install"
+include_recipe "metrictank::collectd"
+include_recipe "metrictank::install"
