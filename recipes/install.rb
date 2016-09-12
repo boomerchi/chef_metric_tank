@@ -60,7 +60,7 @@ directory "/etc/raintank" do
   action :create
 end
 
-directory node['metrictank']['proftrigger']['path'] do
+directory node['metrictank']['proftrigger_path'] do
   owner "root"
   group "root"
   mode "0755"
