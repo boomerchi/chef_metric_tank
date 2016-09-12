@@ -95,6 +95,9 @@ kafkas = if Chef::Config[:solo]
     search("node", node['chef_metric_tank']['kafka_search']).map { |c| c.fqdn }.sort || node['chef_metric_tank']['kafkas']
   end
 kafka_brokers = kafkas.map { |k| "#{k}:#{node['chef_metric_tank']['kafka']['kafka_port']}" }.join(",")
+node['metrictank']['kafka_mdm_in_brokers'] = kafka_brokers
+node['metrictank']['kafka_mdam_in_brokers'] = kafka_brokers
+node['metrictank']['kafka_cluster_brokers'] = kafka_brokers
 
 
 template "/etc/raintank/metrictank.ini" do
