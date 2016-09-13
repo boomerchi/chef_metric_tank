@@ -1,13 +1,6 @@
 # other variables
 default[:metrictank][:packagecloud_repo] = "raintank/raintank"
 
-default[:metrictank][:kafka_search] = "chef_environment:#{node.chef_environment} AND tags:kafka"
-default[:metrictank][:kafkas] = []
-
-
-
-
-
 # variables that literally translate to the config directly
 
 ## misc ##

@@ -68,17 +68,6 @@ directory node['metrictank']['proftrigger_path'] do
   action :create
 end
 
-kafkas = if Chef::Config[:solo]
-    node['metrictank']['kafkas']
-  else
-    search("node", node['metrictank']['kafka_search']).map { |c| c.fqdn }.sort || node['metrictank']['kafkas']
-  end
-kafka_brokers = kafkas.map { |k| "#{k}:#{node['metrictank']['kafka']['kafka_port']}" }.join(",")
-node['metrictank']['kafka_mdm_in_brokers'] = kafka_brokers
-node['metrictank']['kafka_mdam_in_brokers'] = kafka_brokers
-node['metrictank']['kafka_cluster_brokers'] = kafka_brokers
-
-
 template "/etc/raintank/metrictank.ini" do
   source "metrictank.ini.erb"
   mode '0644'
