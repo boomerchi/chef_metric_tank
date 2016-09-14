@@ -1,5 +1,5 @@
 #
-# Cookbook Name:: chef_metric_tank
+# Cookbook Name:: metrictank
 # Recipe:: collectd
 #
 # Copyright (C) 2016 Raintank, Inc.

@@ -1,9 +1,9 @@
-name             'chef_metric_tank'
+name             'metrictank'
 maintainer       'Raintank, Inc.'
 maintainer_email 'cookbooks@raintank.io'
 license          'Apache 2.0'
-description      'Installs/Configures chef_metric_tank'
-long_description 'Installs/Configures chef_metric_tank'
+description      'Installs/Configures metrictank'
+long_description 'Installs/Configures metrictank'
 version          '0.2.2'
 
 depends 'chef_base', '~> 0.1.0'

@@ -84,7 +84,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     }
 
     chef.run_list = [
-      'recipe[chef_metric_tank::install]'
+      'recipe[metrictank::install]'
     ]
   end
 end
