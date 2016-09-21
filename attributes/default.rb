@@ -213,3 +213,11 @@ default[:metrictank][:cassandra_idx][:timeout] = "1s"
 default[:metrictank][:cassandra_idx][:num_conns] = 10
 # Max number of metricDefs allowed to be unwritten to cassandra
 default[:metrictank][:cassandra_idx][:write_queue_size] = 100000
+#automatically clear series from the index if they have not been seen for this much time.
+default[:metrictank][:cassandra_idx][:max_stale] = 0
+#Interval at which the index should be checked for stale series.
+default[:metrictank][:cassandra_idx][:prune_interval] = "3h"
+#frequency at which we should update the metricDef lastUpdate field.
+default[:metrictank][:cassandra_idx][:update_interval] = "4h"
+#fuzzyness factor for update-interval. should be in the range 0 > fuzzyness <= 1. With an updateInterval of 4hours and fuzzyness of 0.5, metricDefs will be updated every 4-6hours.
+default[:metrictank][:cassandra_idx][:update_fuzzyness] = 0.5
