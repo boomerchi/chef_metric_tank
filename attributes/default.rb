@@ -214,7 +214,7 @@ default[:metrictank][:cassandra_idx][:num_conns] = 10
 # Max number of metricDefs allowed to be unwritten to cassandra
 default[:metrictank][:cassandra_idx][:write_queue_size] = 100000
 #automatically clear series from the index if they have not been seen for this much time.
-default[:metrictank][:cassandra_idx][:max_stale] = 0
+default[:metrictank][:cassandra_idx][:max_stale] = "0"
 #Interval at which the index should be checked for stale series.
 default[:metrictank][:cassandra_idx][:prune_interval] = "3h"
 #frequency at which we should update the metricDef lastUpdate field.
