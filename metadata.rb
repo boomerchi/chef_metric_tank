@@ -4,7 +4,7 @@ maintainer_email 'cookbooks@raintank.io'
 license          'Apache 2.0'
 description      'Installs/Configures metrictank'
 long_description 'Installs/Configures metrictank'
-version          '0.2.2'
+version          '0.2.3'
 
 depends 'chef_base', '~> 0.1.0'
 depends 'logrotate', '~> 1.9.1'
