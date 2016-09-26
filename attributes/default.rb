@@ -141,6 +141,8 @@ default[:metrictank][:kafka_mdm_in][:consumer_max_wait_time] = "1s"
 default[:metrictank][:kafka_mdm_in][:consumer_max_processing_time] = "1s"
 # How many outstanding requests a connection is allowed to have before sending on it blocks
 default[:metrictank][:kafka_mdm_in][:net_max_open_requests] = 100
+# The number of metrics to buffer in internal and external channels
+default[:metrictank][:kafka_mdm_in][:channel_buffer_size] = 256
 
 ### kafka-mdam input (optional, discouraged)
 #[kafka-mdam-in]
