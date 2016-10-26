@@ -36,6 +36,8 @@ default[:metrictank][:metric_max_stale] = "6h"
 default[:metrictank][:gc_interval] = "1h"
 
 # duration before secondary nodes start serving requests
+# shorter warmup means metrictank will need to query cassandra more if it doesn't have requested data yet.
+# in clusters, best to assure the primary has saved all the data that a newly warmup instance will need to query, to prevent gaps in charts
 default[:metrictank][:warm_up_period] = "1h"
 
 # settings for rollups (aggregation for archives)
@@ -57,12 +59,21 @@ default[:metrictank][:max_days_per_req] = 365000
 
 ## metric data storage in cassandra ##
 
+# see https://github.com/raintank/metrictank/blob/master/docs/cassandra.md for more details
 # comma-separated list of hostnames to connect to
 default[:metrictank][:cassandra_addrs] = ""
 # keyspace to use for storing the metric data table
 default[:metrictank][:cassandra_keyspace] = "raintank"
 # desired write consistency (any|one|two|three|quorum|all|local_quorum|each_quorum|local_one
 default[:metrictank][:cassandra_consistency] = "one"
+# how to select which hosts to query
+# roundrobin                : iterate all hosts, spreading queries evenly.
+# hostpool-simple           : basic pool that tracks which hosts are up and which are not.
+# hostpool-epsilon-greedy   : prefer best hosts, but regularly try other hosts to stay on top of all hosts.
+# tokenaware,roundrobin              : prefer host that the needed data, fallback to roundrobin.
+# tokenaware,hostpool-simple         : prefer host that the needed data, fallback to hostpool-simple.
+# tokenaware,hostpool-epsilon-greedy : prefer host that the needed data, fallback to hostpool-epsilon-greedy.
+default[:metrictank][:cassandra_host_selection_policy] = "roundrobin"
 # cassandra timeout in milliseconds
 default[:metrictank][:cassandra_timeout] = 1000
 # max number of concurrent reads to cassandra
@@ -73,6 +84,8 @@ default[:metrictank][:cassandra_write_concurrency] = 10
 default[:metrictank][:cassandra_read_queue_size] = 100
 # write queue size per cassandra worker. should be large engough to hold all at least the total number of series expected, divided by how many workers you have
 default[:metrictank][:cassandra_write_queue_size] = 100000
+# how many times to retry a query before failing it
+default[:metrictank][:cassandra_retries] = 0
 # CQL protocol version. cassandra 3.x needs v3 or 4.
 default[:metrictank][:cql_protocol_version] = 4
 
@@ -96,8 +109,9 @@ default[:metrictank][:proftrigger_freq] = "60s"
 default[:metrictank][:proftrigger_path] = "/tmp"
 # minimum time between triggered profiles
 default[:metrictank][:proftrigger_min_diff] = "1h"
-# if this many bytes allocated, trigger a heap profile
-default[:metrictank][:proftrigger_heap_thresh] = 10000000
+# if process consumes this many bytes (see bytes_sys in dashboard), trigger a heap profile for developer diagnosis
+# set it higher than your typical memory usage, but lower than how much RAM the process can take before its get killed
+default[:metrictank][:proftrigger_heap_thresh] = 25000000000
 
 # only log incoming requests if their timerange is at least this duration. Use 0 to disable
 default[:metrictank][:log_min_dur] = "5min"
@@ -125,6 +139,7 @@ default[:metrictank][:kafka_mdm_in][:brokers] = ""
 # kafka topic (may be given multiple times as a comma-separated list)
 default[:metrictank][:kafka_mdm_in][:topics] = "mdm"
 # offset to start consuming from. Can be one of newest, oldest,last or a time duration
+# the further back in time you go, the more old data you can load into metrictank, but the longer it takes to catch up to realtime data
 default[:metrictank][:kafka_mdm_in][:offset] = "last"
 # save interval for offsets
 default[:metrictank][:kafka_mdm_in][:offset_commit_interval] = "5s"

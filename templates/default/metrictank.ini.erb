@@ -33,6 +33,8 @@ metric-max-stale = <%= @node['metrictank']['metric_max_stale'] %>
 gc-interval = <%= @node['metrictank']['gc_interval'] %>
 
 # duration before secondary nodes start serving requests
+# shorter warmup means metrictank will need to query cassandra more if it doesn't have requested data yet.
+# in clusters, best to assure the primary has saved all the data that a newly warmup instance will need to query, to prevent gaps in charts
 warm-up-period = <%= @node['metrictank']['warm_up_period'] %>
 
 # settings for rollups (aggregation for archives)
@@ -54,12 +56,21 @@ max-days-per-req = <%= @node['metrictank']['max_days_per_req'] %>
 
 ## metric data storage in cassandra ##
 
+# see https://github.com/raintank/metrictank/blob/master/docs/cassandra.md for more details
 # comma-separated list of hostnames to connect to
 cassandra-addrs = <%= @node['metrictank']['cassandra_addrs'] %>
 # keyspace to use for storing the metric data table
 cassandra-keyspace = <%= @node['metrictank']['cassandra_keyspace'] %>
 # desired write consistency (any|one|two|three|quorum|all|local_quorum|each_quorum|local_one
 cassandra-consistency = <%= @node['metrictank']['cassandra_consistency'] %>
+# how to select which hosts to query
+# roundrobin                : iterate all hosts, spreading queries evenly.
+# hostpool-simple           : basic pool that tracks which hosts are up and which are not.
+# hostpool-epsilon-greedy   : prefer best hosts, but regularly try other hosts to stay on top of all hosts.
+# tokenaware,roundrobin              : prefer host that the needed data, fallback to roundrobin.
+# tokenaware,hostpool-simple         : prefer host that the needed data, fallback to hostpool-simple.
+# tokenaware,hostpool-epsilon-greedy : prefer host that the needed data, fallback to hostpool-epsilon-greedy.
+cassandra-host-selection-policy = <%= @node['metrictank']['cassandra_host_selection_policy'] %>
 # cassandra timeout in milliseconds
 cassandra-timeout = <%= @node['metrictank']['cassandra_timeout'] %>
 # max number of concurrent reads to cassandra
@@ -70,6 +81,8 @@ cassandra-write-concurrency = <%= @node['metrictank']['cassandra_write_concurren
 cassandra-read-queue-size = <%= @node['metrictank']['cassandra_read_queue_size'] %>
 # write queue size per cassandra worker. should be large engough to hold all at least the total number of series expected, divided by how many workers you have
 cassandra-write-queue-size = <%= @node['metrictank']['cassandra_write_queue_size'] %>
+# how many times to retry a query before failing it
+cassandra-retries = <%= @node['metrictank']['cassandra_retries'] %>
 # CQL protocol version. cassandra 3.x needs v3 or 4.
 cql-protocol-version = <%= @node['metrictank']['cql_protocol_version'] %>
 
@@ -93,7 +106,8 @@ proftrigger-freq = <%= @node['metrictank']['proftrigger_freq'] %>
 proftrigger-path = <%= @node['metrictank']['proftrigger_path'] %>
 # minimum time between triggered profiles
 proftrigger-min-diff = <%= @node['metrictank']['proftrigger_min_diff'] %>
-# if this many bytes allocated, trigger a heap profile
+# if process consumes this many bytes (see bytes_sys in dashboard), trigger a heap profile for developer diagnosis
+# set it higher than your typical memory usage, but lower than how much RAM the process can take before its get killed
 proftrigger-heap-thresh = <%= @node['metrictank']['proftrigger_heap_thresh'] %>
 
 # only log incoming requests if their timerange is at least this duration. Use 0 to disable
@@ -126,6 +140,7 @@ brokers = <%= @node['metrictank']['kafka_mdm_in']['brokers'] %>
 # kafka topic (may be given multiple times as a comma-separated list)
 topics = <%= @node['metrictank']['kafka_mdm_in']['topics'] %>
 # offset to start consuming from. Can be one of newest, oldest,last or a time duration
+# the further back in time you go, the more old data you can load into metrictank, but the longer it takes to catch up to realtime data
 offset = <%= @node['metrictank']['kafka_mdm_in']['offset'] %>
 # save interval for offsets
 offset-commit-interval = <%= @node['metrictank']['kafka_mdm_in']['offset_commit_interval'] %>
