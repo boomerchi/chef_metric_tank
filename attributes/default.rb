@@ -120,7 +120,7 @@ default[:metrictank][:log_level] = 2
 
 
 ## http api ##
-[http]
+#[http]
 # tcp address for metrictank to bind to for its HTTP interface
 default[:metrictank][:http][:listen] = ":6060"
 # use HTTPS
@@ -164,7 +164,7 @@ default[:metrictank][:kafka_mdm_in][:offset_commit_interval] = "5s"
 # it will be created (incl parent dirs) if not existing.
 default[:metrictank][:kafka_mdm_in][:data_dir] = ""
 # The number of metrics to buffer in internal and external channels
-defalut[:metrictank][:kafka_mdm_in][:channel_buffer_size] = 1000000
+default[:metrictank][:kafka_mdm_in][:channel_buffer_size] = 1000000
 # The minimum number of message bytes to fetch in a request
 default[:metrictank][:kafka_mdm_in][:consumer_fetch_min] = 1
 # The default number of message bytes to fetch in a request
