@@ -5,16 +5,14 @@ default[:metrictank][:packagecloud_repo] = "raintank/raintank"
 
 ## misc ##
 
-# tcp address for metrictank to bind to for its HTTP interface
-default[:metrictank][:listen] = ":6060"
+# instance identifier. must be unique. used in clustering messages, for naming queue consumers and emitted metrics.
+default[:metrictank][:instance] = "default"
 
 # accounting period to track per-org usage metrics
 default[:metrictank][:accounting_period] = "5min"
 
 ## clustering ##
 
-# cluster node name and value used to differentiate metrics between nodes
-default[:metrictank][:instance] = "default"
 # the primary node writes data to cassandra. There should only be 1 primary node per cluster of nodes
 default[:metrictank][:primary_node] = false
 
@@ -48,15 +46,6 @@ default[:metrictank][:warm_up_period] = "1h"
 # 1hr worth of data, in chunks of 6 hours, 2 chunks in mem, keep for 1 year, but this series is not ready yet for querying.
 default[:metrictank][:agg_settings] = ""
 
-
-## http api ##
-
-# limit on how many points could be requested in one request. 1M allows 500 series at a MaxDataPoints of 2000. (0 disables limit)
-default[:metrictank][:max_points_per_req] = 1000000
-# limit on what kind of time range can be requested in one request. the default allows 500 series of 2 years. (0 disables limit)
-default[:metrictank][:max_days_per_req] = 365000
-
-
 ## metric data storage in cassandra ##
 
 # see https://github.com/raintank/metrictank/blob/master/docs/cassandra.md for more details
@@ -70,10 +59,10 @@ default[:metrictank][:cassandra_consistency] = "one"
 # roundrobin                : iterate all hosts, spreading queries evenly.
 # hostpool-simple           : basic pool that tracks which hosts are up and which are not.
 # hostpool-epsilon-greedy   : prefer best hosts, but regularly try other hosts to stay on top of all hosts.
-# tokenaware,roundrobin              : prefer host that the needed data, fallback to roundrobin.
-# tokenaware,hostpool-simple         : prefer host that the needed data, fallback to hostpool-simple.
-# tokenaware,hostpool-epsilon-greedy : prefer host that the needed data, fallback to hostpool-epsilon-greedy.
-default[:metrictank][:cassandra_host_selection_policy] = "roundrobin"
+# tokenaware,roundrobin              : prefer host that has the needed data, fallback to roundrobin.
+# tokenaware,hostpool-simple         : prefer host that has the needed data, fallback to hostpool-simple.
+# tokenaware,hostpool-epsilon-greedy : prefer host that has the needed data, fallback to hostpool-epsilon-greedy.
+default[:metrictank][:cassandra_host_selection_policy] = "tokenaware,hostpool-epsilon-greedy"
 # cassandra timeout in milliseconds
 default[:metrictank][:cassandra_timeout] = 1000
 # max number of concurrent reads to cassandra
@@ -88,6 +77,19 @@ default[:metrictank][:cassandra_write_queue_size] = 100000
 default[:metrictank][:cassandra_retries] = 0
 # CQL protocol version. cassandra 3.x needs v3 or 4.
 default[:metrictank][:cql_protocol_version] = 4
+
+# enable SSL connection to cassandra
+default[:metrictank][:cassandra_ssl] = false
+# cassandra CA certficate path when using SSL
+default[:metrictank][:cassandra_ca_path] = /etc/raintank/ca.pem
+# host (hostname and server cert) verification when using SSL
+default[:metrictank][:cassandra_host_verification] = true
+# enable cassandra user authentication
+default[:metrictank][:cassandra_auth] = false
+# username for authentication
+default[:metrictank][:cassandra_username] = cassandra
+# password for authentication
+default[:metrictank][:cassandra_password] = cassandra
 
 ## Profiling, instrumentation and logging ##
 
@@ -113,11 +115,26 @@ default[:metrictank][:proftrigger_min_diff] = "1h"
 # set it higher than your typical memory usage, but lower than how much RAM the process can take before its get killed
 default[:metrictank][:proftrigger_heap_thresh] = 25000000000
 
-# only log incoming requests if their timerange is at least this duration. Use 0 to disable
-default[:metrictank][:log_min_dur] = "5min"
-
 # only log log-level and higher. 0=TRACE|1=DEBUG|2=INFO|3=WARN|4=ERROR|5=CRITICAL|6=FATAL
 default[:metrictank][:log_level] = 2
+
+
+## http api ##
+[http]
+# tcp address for metrictank to bind to for its HTTP interface
+default[:metrictank][:http][:listen] = ":6060"
+# use HTTPS
+default[:metrictank][:http][:ssl] = false
+# SSL certificate file
+default[:metrictank][:http][:cert_file] = /etc/ssl/certs/ssl-cert-snakeoil.pem
+# SSL key file
+default[:metrictank][:http][:key_file] = /etc/ssl/private/ssl-cert-snakeoil.key
+# limit on how many points could be requested in one request. 1M allows 500 series at a MaxDataPoints of 2000. (0 disables limit)
+default[:metrictank][:http][:max_points_per_req] = 1000000
+# limit on what kind of time range can be requested in one request. the default allows 500 series of 2 years. (0 disables limit)
+default[:metrictank][:http][:max_days_per_req] = 365000
+# only log incoming requests if their timerange is at least this duration. Use 0 to disable
+default[:metrictank][:http][:log_min_dur] = "5min"
 
 
 ## metric data inputs ##
@@ -146,6 +163,8 @@ default[:metrictank][:kafka_mdm_in][:offset_commit_interval] = "5s"
 # directory to store partition offsets index. supports relative or absolute paths. empty means working dir.
 # it will be created (incl parent dirs) if not existing.
 default[:metrictank][:kafka_mdm_in][:data_dir] = ""
+# The number of metrics to buffer in internal and external channels
+defalut[:metrictank][:kafka_mdm_in][:channel_buffer_size] = 1000000
 # The minimum number of message bytes to fetch in a request
 default[:metrictank][:kafka_mdm_in][:consumer_fetch_min] = 1
 # The default number of message bytes to fetch in a request
@@ -156,19 +175,6 @@ default[:metrictank][:kafka_mdm_in][:consumer_max_wait_time] = "1s"
 default[:metrictank][:kafka_mdm_in][:consumer_max_processing_time] = "1s"
 # How many outstanding requests a connection is allowed to have before sending on it blocks
 default[:metrictank][:kafka_mdm_in][:net_max_open_requests] = 100
-# The number of metrics to buffer in internal and external channels
-default[:metrictank][:kafka_mdm_in][:channel_buffer_size] = 256
-
-### kafka-mdam input (optional, discouraged)
-#[kafka-mdam-in]
-default[:metrictank][:kafka_mdam_in][:enabled] = false
-# tcp address (may be given multiple times as a comma-separated list)
-default[:metrictank][:kafka_mdam_in][:brokers] = ""
-# kafka topic (may be given multiple times as a comma-separated list)
-default[:metrictank][:kafka_mdam_in][:topics] = "mdam"
-# consumer group name
-default[:metrictank][:kafka_mdam_in][:group] = "group1"
-
 
 ## clustering transports ##
 
@@ -238,3 +244,15 @@ default[:metrictank][:cassandra_idx][:prune_interval] = "3h"
 default[:metrictank][:cassandra_idx][:update_interval] = "4h"
 #fuzzyness factor for update-interval. should be in the range 0 > fuzzyness <= 1. With an updateInterval of 4hours and fuzzyness of 0.5, metricDefs will be updated every 4-6hours.
 default[:metrictank][:cassandra_idx][:update_fuzzyness] = 0.5
+# enable SSL connection to cassandra
+default[:metrictank][:cassandra_idx][:ssl] = false
+# cassandra CA certficate path when using SSL
+default[:metrictank][:cassandra_idx][:ca_path] = /etc/raintank/ca.pem
+# host (hostname and server cert) verification when using SSL
+default[:metrictank][:cassandra_idx][:host_verification] = true
+# enable cassandra user authentication
+default[:metrictank][:cassandra_idx][:auth] = false
+# username for authentication
+default[:metrictank][:cassandra_idx][:username] = cassandra
+# password for authentication
+default[:metrictank][:cassandra_idx][:password] = cassandra
