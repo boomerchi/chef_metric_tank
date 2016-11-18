@@ -81,15 +81,15 @@ default[:metrictank][:cql_protocol_version] = 4
 # enable SSL connection to cassandra
 default[:metrictank][:cassandra_ssl] = false
 # cassandra CA certficate path when using SSL
-default[:metrictank][:cassandra_ca_path] = /etc/raintank/ca.pem
+default[:metrictank][:cassandra_ca_path] = "/etc/raintank/ca.pem"
 # host (hostname and server cert) verification when using SSL
 default[:metrictank][:cassandra_host_verification] = true
 # enable cassandra user authentication
 default[:metrictank][:cassandra_auth] = false
 # username for authentication
-default[:metrictank][:cassandra_username] = cassandra
+default[:metrictank][:cassandra_username] = "cassandra"
 # password for authentication
-default[:metrictank][:cassandra_password] = cassandra
+default[:metrictank][:cassandra_password] = "cassandra"
 
 ## Profiling, instrumentation and logging ##
 
@@ -126,9 +126,9 @@ default[:metrictank][:http][:listen] = ":6060"
 # use HTTPS
 default[:metrictank][:http][:ssl] = false
 # SSL certificate file
-default[:metrictank][:http][:cert_file] = /etc/ssl/certs/ssl-cert-snakeoil.pem
+default[:metrictank][:http][:cert_file] = "/etc/ssl/certs/ssl-cert-snakeoil.pem"
 # SSL key file
-default[:metrictank][:http][:key_file] = /etc/ssl/private/ssl-cert-snakeoil.key
+default[:metrictank][:http][:key_file] = "/etc/ssl/private/ssl-cert-snakeoil.key"
 # limit on how many points could be requested in one request. 1M allows 500 series at a MaxDataPoints of 2000. (0 disables limit)
 default[:metrictank][:http][:max_points_per_req] = 1000000
 # limit on what kind of time range can be requested in one request. the default allows 500 series of 2 years. (0 disables limit)
@@ -247,12 +247,12 @@ default[:metrictank][:cassandra_idx][:update_fuzzyness] = 0.5
 # enable SSL connection to cassandra
 default[:metrictank][:cassandra_idx][:ssl] = false
 # cassandra CA certficate path when using SSL
-default[:metrictank][:cassandra_idx][:ca_path] = /etc/raintank/ca.pem
+default[:metrictank][:cassandra_idx][:ca_path] = "/etc/raintank/ca.pem"
 # host (hostname and server cert) verification when using SSL
 default[:metrictank][:cassandra_idx][:host_verification] = true
 # enable cassandra user authentication
 default[:metrictank][:cassandra_idx][:auth] = false
 # username for authentication
-default[:metrictank][:cassandra_idx][:username] = cassandra
+default[:metrictank][:cassandra_idx][:username] = "cassandra"
 # password for authentication
-default[:metrictank][:cassandra_idx][:password] = cassandra
+default[:metrictank][:cassandra_idx][:password] = "cassandra"
