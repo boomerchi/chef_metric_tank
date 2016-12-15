@@ -180,11 +180,11 @@ default[:metrictank][:kafka_mdm_in][:net_max_open_requests] = 100
 ## basic clustering settings ##
 #[cluster]
 # The primary node writes data to cassandra. There should only be 1 primary node per shardGroup.
-default[:metrictank][:cluster][:primary-node] = true
+default[:metrictank][:cluster][:primary_node] = true
 # http/s addresses of other nodes, comma separated. use this if you shard your data and want to query other instances
 default[:metrictank][:cluster][:peers] = ""
 # Interval to probe peer nodes
-default[:metrictank][:cluster][:probe-interval] = "2s"
+default[:metrictank][:cluster][:probe_interval] = "2s"
 # Operating mode of cluster. (single|multi)
 default[:metrictank][:cluster][:mode] = "single"
 
