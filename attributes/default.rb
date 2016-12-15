@@ -11,11 +11,6 @@ default[:metrictank][:instance] = "default"
 # accounting period to track per-org usage metrics
 default[:metrictank][:accounting_period] = "5min"
 
-## clustering ##
-
-# the primary node writes data to cassandra. There should only be 1 primary node per cluster of nodes
-default[:metrictank][:primary_node] = false
-
 ## data ##
 
 # see https://github.com/raintank/metrictank/blob/master/docs/data-knobs.md for more details
@@ -39,11 +34,13 @@ default[:metrictank][:gc_interval] = "1h"
 default[:metrictank][:warm_up_period] = "1h"
 
 # settings for rollups (aggregation for archives)
-# comma-separated of archive specifications.
+# comma-separated list of archive specifications.
 # archive specification is of the form: aggSpan:chunkSpan:numChunks:TTL[:ready as bool. default true]
 # with these aggregation rules: 5min:1h:2:3mon,1h:6h:2:1y:false
 # 5 min of data, store in a chunk that lasts 1hour, keep 2 chunks in memory, keep for 3months in cassandra
 # 1hr worth of data, in chunks of 6 hours, 2 chunks in mem, keep for 1 year, but this series is not ready yet for querying.
+# When running a cluster of metrictank instances, all instances should have the same agg-settings.
+# chunk spans must be valid values as described here https://github.com/raintank/metrictank/blob/master/docs/data-knobs.md
 default[:metrictank][:agg_settings] = ""
 
 ## metric data storage in cassandra ##
@@ -144,6 +141,8 @@ default[:metrictank][:http][:log_min_dur] = "5min"
 default[:metrictank][:carbon_in][:enabled] = false
 # tcp address
 default[:metrictank][:carbon_in][:addr] = ":2003"
+# represents the "partition" of your data if you decide to partition your data.
+default[:metrictank][:carbon_in][:partition] = 1
 # needed to know your raw resolution for your metrics. see http://graphite.readthedocs.io/en/latest/config-carbon.html#storage-schemas-conf
 # NOTE: does NOT use aggregation and retention settings from this file.  We use agg-settings and ttl for that.
 default[:metrictank][:carbon_in][:schemas_file] = "/path/to/your/schemas-file"
@@ -158,6 +157,8 @@ default[:metrictank][:kafka_mdm_in][:topics] = "mdm"
 # offset to start consuming from. Can be one of newest, oldest,last or a time duration
 # the further back in time you go, the more old data you can load into metrictank, but the longer it takes to catch up to realtime data
 default[:metrictank][:kafka_mdm_in][:offset] = "last"
+# kafka partitions to consume. use '*' or a comma separated list of id's
+default[:metrictank][:kafka_mdm_in][:partitions] = "*"
 # save interval for offsets
 default[:metrictank][:kafka_mdm_in][:offset_commit_interval] = "5s"
 # directory to store partition offsets index. supports relative or absolute paths. empty means working dir.
@@ -176,8 +177,18 @@ default[:metrictank][:kafka_mdm_in][:consumer_max_processing_time] = "1s"
 # How many outstanding requests a connection is allowed to have before sending on it blocks
 default[:metrictank][:kafka_mdm_in][:net_max_open_requests] = 100
 
-## clustering transports ##
+## basic clustering settings ##
+#[cluster]
+# The primary node writes data to cassandra. There should only be 1 primary node per shardGroup.
+default[:metrictank][:cluster][:primary-node] = true
+# http/s addresses of other nodes, comma separated. use this if you shard your data and want to query other instances
+default[:metrictank][:cluster][:peers] = ""
+# Interval to probe peer nodes
+default[:metrictank][:cluster][:probe-interval] = "2s"
+# Operating mode of cluster. (single|multi)
+default[:metrictank][:cluster][:mode] = "single"
 
+## clustering transports for tracking chunk saves between replicated instances ##
 ### kafka as transport for clustering messages (recommended)
 #[kafka-cluster]
 default[:metrictank][:kafka_cluster][:enabled] = true
